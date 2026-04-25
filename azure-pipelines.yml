@@ -4,16 +4,38 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  # 1. Checkout GitHub
+  - checkout: self
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  # 2. Sync GitHub -> Azure Repos
+  - script: |
+      set -e
+      echo "Cloning GitHub as mirror..."
+      git clone --mirror https://github.com/itregit/project-01.git
+      cd project-01.git
+      echo "Pushing to Azure Repos..."
+      git remote add azure https://$(AZURE_DEVOPS_PAT)@dev.azure.com/if25b203/project-01/_git/project-01
+      git push --mirror azure
+    displayName: "Sync GitHub → Azure Repos"
+
+  # 3. Build
+  - script: |
+      echo "Build step"
+      # npm install / mvn package
+    displayName: "Build"
+
+  # 4. Test
+  - script: |
+      echo "Test step"
+    displayName: "Test"
+
+  # 5. Deploy
+  - script: |
+      echo "Deploy step"
+    displayName: "Deploy"
