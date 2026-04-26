@@ -8,11 +8,11 @@ variables:
   - group: KeyVaultVariables
 
 steps:
-  # 1. Checkout
+  # Checkout
   - checkout: self
     persistCredentials: true
 
-  # 2. Install JDK 25
+  # Install JDK 25
   - script: |
       set -e
       
@@ -27,11 +27,11 @@ steps:
       $JDK_DIR/bin/java -version
     displayName: "Install JDK 25 (Temurin)"
 
-  # 3. Prepare Maven cache directory
+  # Prepare Maven cache directory
   - script: mkdir -p /home/vsts/.m2/repository
     displayName: "Prepare Maven cache directory"
 
-  # 4. Cache Maven dependencies
+  # Cache Maven dependencies
   - task: Cache@2
     inputs:
       key: 'maven | "$(Agent.OS)" | **/pom.xml'
@@ -39,34 +39,37 @@ steps:
         maven | "$(Agent.OS)"
       path: /home/vsts/.m2/repository
 
-  # 5. Build
+  # Build
   - script: mvn -B clean package -DskipTests
     displayName: "Build (Maven)"
     env:
       JAVA_HOME: $(JAVA_HOME)
       PATH: $(JAVA_HOME)/bin:$(PATH)
 
-  # 6. Run
+  # Run
   - script: java -cp target/project-02-1.0-SNAPSHOT.jar org.example.Main
     displayName: "Run application"
     env:
       JAVA_HOME: $(JAVA_HOME)
       PATH: $(JAVA_HOME)/bin:$(PATH)
+      DB_USER: $(db-user)
+      DB_PASSWORD: $(db-password)
+      JWT_SECRET: $(jwt-secret-base64)
 
-  # 7. Test
+  # Test
   - script: mvn -B test
     displayName: "Test (JUnit)"
     env:
       JAVA_HOME: $(JAVA_HOME)
       PATH: $(JAVA_HOME)/bin:$(PATH)
 
-  # 8. Publish test results
+  # Publish test results
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       testRunTitle: 'JUnit Tests'
     condition: succeededOrFailed()
 
-  # 9. Deploy (placeholder)
+  # Deploy (placeholder)
   - script: echo "Deploy step"
     displayName: "Deploy"
