@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
   - main
 
@@ -13,22 +8,42 @@ variables:
   - group: KeyVaultVariables
 
 steps:
-  # 1. Checkout GitHub
+  # 1. Checkout
   - checkout: self
     persistCredentials: true
 
-  # 2. Build
+  # 2. Install Java 25 (manual, since hosted agents may not support it yet)
   - script: |
-      echo "Build step"
-      # npm install / mvn package
-    displayName: "Build"
+      wget https://download.java.net/java/GA/jdk25/latest/binaries/openjdk-25_linux-x64_bin.tar.gz
+      tar -xzf openjdk-25_linux-x64_bin.tar.gz
+      echo "##vso[task.setvariable variable=JAVA_HOME]$(pwd)/jdk-25"
+      echo "##vso[task.setvariable variable=PATH]$(pwd)/jdk-25/bin:$(PATH)"
+      java -version
+    displayName: "Install JDK 25"
 
-  # 3. Test
-  - script: |
-      echo "Test step"
-    displayName: "Test"
+  # 3. Cache Maven dependencies
+  - task: Cache@2
+    inputs:
+      key: 'maven | "$(Agent.OS)" | **/pom.xml'
+      restoreKeys: |
+        maven | "$(Agent.OS)"
+      path: ~/.m2/repository
 
-  # 4. Deploy
-  - script: |
-      echo "Deploy step"
+  # 4. Build (skip tests here)
+  - script: mvn -B clean package -DskipTests
+    displayName: "Build (Maven)"
+
+  # 5. Test
+  - script: mvn -B test
+    displayName: "Test (JUnit)"
+
+  # 6. Publish test results
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      testRunTitle: 'JUnit Tests'
+    condition: succeededOrFailed()
+
+  # 7. Deploy (placeholder)
+  - script: echo "Deploy step"
     displayName: "Deploy"
