@@ -1,26 +1,64 @@
 # =========================
-# Java
+# Java / Build Outputs
 # =========================
 *.class
 *.jar
 *.war
 *.ear
-*.log
 
-# Maven / Gradle
 target/
 build/
 .gradle/
 out/
+bin/
+
+# Maven wrapper exception
+!.mvn/wrapper/maven-wrapper.jar
+
+# Source-specific build dirs (optional IDE/build isolation)
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# =========================
+# Kotlin
+# =========================
+.kotlin
 
 # =========================
 # IntelliJ IDEA
 # =========================
 .idea/
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+.idea_modules/
+
 *.iml
 *.iws
 *.ipr
-.idea_modules/
+
+# =========================
+# Eclipse
+# =========================
+.classpath
+.project
+.factorypath
+.settings/
+.springBeans
+.sts4-cache
+.apt_generated
+
+# =========================
+# NetBeans
+# =========================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
 # =========================
 # VS Code
@@ -41,13 +79,8 @@ out/
 Thumbs.db
 
 # =========================
-# Logs and temp files
+# Temp / logs
 # =========================
-*.log
 tmp/
 temp/
-
-# =========================
-# Compiled output (general)
-# =========================
-bin/
+*.log
