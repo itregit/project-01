@@ -17,38 +17,18 @@ steps:
   - checkout: self
     persistCredentials: true
 
-  # 2. Sync GitHub → Azure Repos
-  - script: |
-      set -e
-
-      echo "Cloning GitHub as mirror..."
-      git clone --mirror https://github.com/itregit/project-01.git
-      cd project-01.git
-
-      echo "Configuring Azure DevOps auth..."
-      git remote add azure https://dev.azure.com/if25b203/project-01/_git/project-01
-
-      # Inject OAuth token for non-interactive push
-      git config http.extraheader "AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN"
-
-      echo "Pushing to Azure Repos..."
-      git push --mirror azure
-    env:
-      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-    displayName: "Sync GitHub → Azure Repos (OAuth)"
-
-  # 3. Build
+  # 2. Build
   - script: |
       echo "Build step"
       # npm install / mvn package
     displayName: "Build"
 
-  # 4. Test
+  # 3. Test
   - script: |
       echo "Test step"
     displayName: "Test"
 
-  # 5. Deploy
+  # 4. Deploy
   - script: |
       echo "Deploy step"
     displayName: "Deploy"
