@@ -15,15 +15,17 @@ steps:
   # 2. Install JDK 25
   - script: |
       set -e
-      wget https://download.java.net/java/GA/jdk25/latest/binaries/openjdk-25_linux-x64_bin.tar.gz
-      tar -xzf openjdk-25_linux-x64_bin.tar.gz
-
-      JDK_DIR=$(pwd)/jdk-25
-
+      
+      curl -L -o jdk25.tar.gz https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse
+      tar -xzf jdk25.tar.gz
+      
+      JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-25*" | head -n 1)
+      
       echo "##vso[task.setvariable variable=JAVA_HOME]$JDK_DIR"
       echo "Installed JDK at $JDK_DIR"
+      
       $JDK_DIR/bin/java -version
-    displayName: "Install JDK 25"
+    displayName: "Install JDK 25 (Temurin)"
 
   # 3. Cache Maven dependencies
   - task: Cache@2
