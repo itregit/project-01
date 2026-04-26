@@ -12,13 +12,17 @@ steps:
   - checkout: self
     persistCredentials: true
 
-  # 2. Install Java 25 (manual, since hosted agents may not support it yet)
+  # 2. Install JDK 25
   - script: |
+      set -e
       wget https://download.java.net/java/GA/jdk25/latest/binaries/openjdk-25_linux-x64_bin.tar.gz
       tar -xzf openjdk-25_linux-x64_bin.tar.gz
-      echo "##vso[task.setvariable variable=JAVA_HOME]$(pwd)/jdk-25"
-      echo "##vso[task.setvariable variable=PATH]$(pwd)/jdk-25/bin:$(PATH)"
-      java -version
+
+      JDK_DIR=$(pwd)/jdk-25
+
+      echo "##vso[task.setvariable variable=JAVA_HOME]$JDK_DIR"
+      echo "Installed JDK at $JDK_DIR"
+      $JDK_DIR/bin/java -version
     displayName: "Install JDK 25"
 
   # 3. Cache Maven dependencies
@@ -29,13 +33,19 @@ steps:
         maven | "$(Agent.OS)"
       path: ~/.m2/repository
 
-  # 4. Build (skip tests here)
+  # 4. Build
   - script: mvn -B clean package -DskipTests
     displayName: "Build (Maven)"
+    env:
+      JAVA_HOME: $(JAVA_HOME)
+      PATH: $(JAVA_HOME)/bin:$(PATH)
 
   # 5. Test
   - script: mvn -B test
     displayName: "Test (JUnit)"
+    env:
+      JAVA_HOME: $(JAVA_HOME)
+      PATH: $(JAVA_HOME)/bin:$(PATH)
 
   # 6. Publish test results
   - task: PublishTestResults@2
