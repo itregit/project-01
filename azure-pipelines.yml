@@ -23,7 +23,7 @@ steps:
       git clone --mirror https://github.com/itregit/project-01.git
       cd project-01.git
       echo "Pushing to Azure Repos..."
-      git remote add azure https://$(azure-devops-pat)@dev.azure.com/if25b203/project-01/_git/project-01
+      git remote add azure https://git:$(azure-devops-pat)@dev.azure.com/if25b203/project-01/_git/project-01
       git push --mirror azure
     displayName: "Sync GitHub → Azure Repos"
 
