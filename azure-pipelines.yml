@@ -27,35 +27,46 @@ steps:
       $JDK_DIR/bin/java -version
     displayName: "Install JDK 25 (Temurin)"
 
-  # 3. Cache Maven dependencies
+  # 3. Prepare Maven cache directory
+  - script: mkdir -p /home/vsts/.m2/repository
+    displayName: "Prepare Maven cache directory"
+
+  # 4. Cache Maven dependencies
   - task: Cache@2
     inputs:
       key: 'maven | "$(Agent.OS)" | **/pom.xml'
       restoreKeys: |
         maven | "$(Agent.OS)"
-      path: ~/.m2/repository
+      path: /home/vsts/.m2/repository
 
-  # 4. Build
+  # 5. Build
   - script: mvn -B clean package -DskipTests
     displayName: "Build (Maven)"
     env:
       JAVA_HOME: $(JAVA_HOME)
       PATH: $(JAVA_HOME)/bin:$(PATH)
 
-  # 5. Test
+  # 6. Run
+  - script: java -cp target/project-02-1.0-SNAPSHOT.jar org.example.Main
+    displayName: "Run application"
+    env:
+      JAVA_HOME: $(JAVA_HOME)
+      PATH: $(JAVA_HOME)/bin:$(PATH)
+
+  # 7. Test
   - script: mvn -B test
     displayName: "Test (JUnit)"
     env:
       JAVA_HOME: $(JAVA_HOME)
       PATH: $(JAVA_HOME)/bin:$(PATH)
 
-  # 6. Publish test results
+  # 8. Publish test results
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       testRunTitle: 'JUnit Tests'
     condition: succeededOrFailed()
 
-  # 7. Deploy (placeholder)
+  # 9. Deploy (placeholder)
   - script: echo "Deploy step"
     displayName: "Deploy"
