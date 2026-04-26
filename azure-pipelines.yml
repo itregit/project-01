@@ -12,10 +12,15 @@ pool:
 variables:
   - group: KeyVaultVariables
 
+resources:
+  repositories:
+    - repository: githubRepo
+      type: github
+      name: itregit/project-01
+
 steps:
   # 1. Checkout GitHub
-  - checkout: self
-    persistCredentials: true
+  - checkout: githubRepo
 
   # 2. Build
   - script: |
