@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MainTest {
 
     @Test
-    void testMainOutput() {
+    void testPrintHello() {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         PrintStream originalOut = System.out;
 
         System.setOut(new PrintStream(outContent));
         try {
-            Main.main();
+            Main.printHello();
         } finally {
             System.setOut(originalOut);
         }
