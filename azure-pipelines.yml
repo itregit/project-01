@@ -135,7 +135,7 @@ stages:
               publishLocation: "Container"
 
   - stage: Release
-    displayName: "Release"
+    displayName: "Release to App Service"
     dependsOn: Build
     condition: succeeded()
     jobs:
